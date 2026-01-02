@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Marketing Predictor | AI-Powered Campaign Optimization</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-chart-line"></i> BankPredict AI
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">
+                            <i class="fas fa-home"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/predict">
+                            <i class="fas fa-calculator"></i> Predict
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <h1 class="display-4 fw-bold">Predict Banking Campaign Success with <span class="highlight">AI Precision</span></h1>
+                    <p class="lead">Our advanced machine learning model predicts customer subscription probability with 89% accuracy, helping you optimize marketing campaigns and increase conversion rates.</p>
+                    <div class="mt-4">
+                        <a href="/predict" class="btn btn-primary btn-lg me-3">
+                            <i class="fas fa-rocket"></i> Try Predictor
+                        </a>
+                        <a href="#features" class="btn btn-outline-light btn-lg">
+                            <i class="fas fa-chart-bar"></i> Learn More
+                        </a>
+                    </div>
+                </div>
+                <div class="col-lg-6">
+                    <div class="hero-visual">
+                        <div class="floating-card">
+                            <i class="fas fa-brain"></i>
+                            <h4>AI Engine</h4>
+                            <p>Real-time predictions</p>
+                        </div>
+                        <div class="floating-card">
+                            <i class="fas fa-bolt"></i>
+                            <h4>Fast Analysis</h4>
+                            <p>< 1 second response</p>
+                        </div>
+                        <div class="floating-card">
+                            <i class="fas fa-shield-alt"></i>
+                            <h4>Secure</h4>
+                            <p>Enterprise-grade security</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features py-5">
+        <div class="container">
+            <h2 class="text-center mb-5">Why Choose Our Solution</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <h4>Advanced Analytics</h4>
+                        <p>Comprehensive data visualization and insights to drive decision-making.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <h4>AI-Powered</h4>
+                        <p>Machine learning algorithms continuously improve prediction accuracy.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="feature-card">
+                        <div class="feature-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h4>Responsive Design</h4>
+                        <p>Access predictions from any device with our mobile-optimized interface.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats py-5">
+        <div class="container">
+            <div class="row text-center">
+                <div class="col-md-3">
+                    <h3 class="counter">89%</h3>
+                    <p>Prediction Accuracy</p>
+                </div>
+                <div class="col-md-3">
+                    <h3 class="counter">99.9%</h3>
+                    <p>Uptime</p>
+                </div>
+                <div class="col-md-3">
+                    <h3 class="counter">0.3s</h3>
+                    <p>Avg Response Time</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta py-5">
+        <div class="container text-center">
+            <h2>Ready to Transform Your Marketing Campaigns?</h2>
+            <p class="mb-4">Start making data-driven decisions today with our AI prediction platform.</p>
+            <a href="/predict" class="btn btn-light btn-lg">
+                <i class="fas fa-play-circle"></i> Start Predicting Now
+            </a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-chart-line"></i> BankPredict AI</h5>
+                    <p>Advanced AI solutions for banking marketing optimization.</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <p>&copy; 2024 BankPredict AI. All rights reserved.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-github"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

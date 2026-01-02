@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Make Prediction | Bank Marketing Predictor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <style>
+        /* Additional styles for prediction form */
+        .form-section {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border-left: 4px solid var(--secondary-color);
+        }
+        
+        .form-section h5 {
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .section-title {
+            color: var(--primary-color);
+            border-left: 4px solid var(--secondary-color);
+            padding-left: 15px;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+        
+        .feature-highlight {
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-left: 10px;
+        }
+        
+        .input-group-icon {
+            position: relative;
+        }
+        
+        .input-group-icon i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary-color);
+            z-index: 5;
+        }
+        
+        .input-group-icon input,
+        .input-group-icon select {
+            padding-left: 40px;
+        }
+        
+        .range-display {
+            background: var(--light-bg);
+            padding: 0.5rem;
+            border-radius: 10px;
+            margin-top: 0.5rem;
+            font-weight: 500;
+            text-align: center;
+            color: var(--primary-color);
+        }
+        
+        .info-box {
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .feature-importance {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            background: rgba(255,255,255,0.7);
+            border-radius: 10px;
+        }
+        
+        .feature-bar {
+            height: 8px;
+            background: linear-gradient(90deg, #4ECDC4, #44A08D);
+            border-radius: 4px;
+            margin-left: 10px;
+            flex-grow: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-chart-line"></i> BankPredict AI
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-home"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/predict">
+                            <i class="fas fa-calculator"></i> Predict
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">
+                            <i class="fas fa-tachometer-alt"></i> Dashboard
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-5 pt-5">
+        <div class="row">
+            <!-- Left Column - Form -->
+            <div class="col-lg-8">
+                <div class="prediction-header mb-4">
+                    <h1 class="display-6 fw-bold">
+                        <i class="fas fa-magic"></i> Campaign Success Predictor
+                    </h1>
+                    <p class="lead">Fill in customer details to predict subscription probability with our AI model</p>
+                    <div class="accuracy-badge">
+                        <span class="badge bg-success">
+                            <i class="fas fa-bullseye"></i> 89% Accuracy
+                        </span>
+                        <span class="badge bg-info ms-2">
+                            <i class="fas fa-bolt"></i> Real-time Results
+                        </span>
+                    </div>
+                </div>
+
+                <form id="predictionForm" action="/predict" method="POST">
+                    <!-- Personal Information Section -->
+                    <div class="form-section">
+                        <h5>
+                            <i class="fas fa-user-circle me-2"></i> Personal Information
+                            <span class="feature-highlight">High Impact</span>
+                        </h5>
+                        
+                        <div class="row">
+                            <!-- Age -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-birthday-cake me-2"></i> Age
+                                </label>
+                                <div class="input-group-icon">
+                                    <i class="fas fa-user"></i>
+                                    <input type="range" class="form-range" min="18" max="95" step="1" 
+                                           id="ageSlider" oninput="updateValue('age', this.value)">
+                                </div>
+                                <div class="range-display">
+                                    <span id="ageValue">{{ features.numerical.age.default }}</span> years
+                                </div>
+                                <input type="hidden" id="age" name="age" value="{{ features.numerical.age.default }}">
+                                <small class="text-muted">Customer's age (18-95 years)</small>
+                            </div>
+
+                            <!-- Job -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-briefcase me-2"></i> Job Type
+                                </label>
+                                <div class="input-group-icon">
+                                    <i class="fas fa-building"></i>
+                                    <select class="form-select" name="job" required>
+                                        <option value="" disabled selected>Select job type</option>
+                                        {% for job in features.categorical.job %}
+                                        <option value="{{ job }}">{{ job.title() }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <small class="text-muted">Customer's current occupation</small>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Marital Status -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-heart me-2"></i> Marital Status
+                                </label>
+                                <div class="input-group-icon">
+                                    <i class="fas fa-ring"></i>
+                                    <select class="form-select" name="marital" required>
+                                        <option value="" disabled selected>Select marital status</option>
+                                        {% for status in features.categorical.marital %}
+                                        <option value="{{ status }}">{{ status.title() }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Education -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-graduation-cap me-2"></i> Education Level
+                                </label>
+                                <div class="input-group-icon">
+                                    <i class="fas fa-university"></i>
+                                    <select class="form-select" name="education" required>
+                                        <option value="" disabled selected>Select education level</option>
+                                        {% for edu in features.categorical.education %}
+                                        <option value="{{ edu }}">{{ edu.title() }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Financial Information Section -->
+                    <div class="form-section">
+                        <h5>
+                            <i class="fas fa-wallet me-2"></i> Financial Information
+                            <span class="feature-highlight">Critical</span>
+                        </h5>
+                        
+                        <div class="row">
+                            <!-- Balance -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-money-bill-wave me-2"></i> Account Balance ($)
+                                </label>
+                                <div class="input-group-icon">
+                                    <i class="fas fa-dollar-sign"></i>
+                                    <input type="number" class="form-control" name="balance" 
+                                           value="{{ features.numerical.balance.default }}" 
+                                           min="{{ features.numerical.balance.min }}"
+                                           max="{{ features.numerical.balance.max }}"
+                                           step="100">
+                                </div>
+                                <small class="text-muted">Yearly balance average</small>
+                            </div>
+
+                            <!-- Housing Loan -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-home me-2"></i> Housing Loan
+                                </label>
+                                <div class="input-group-icon">
+                                    <i class="fas fa-house-user"></i>
+                                    <select class="form-select" name="housing" required>
+                                        <option value="" disabled selected>Select housing loan status</option>
+                                        <option value="no">No housing loan</option>
+                                        <option value="yes">Has housing loan</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Personal Loan -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-hand-holding-usd me-2"></i> Personal Loan
+                                </label>
+                                <div class="input-group-icon">
+                                    <i class="fas fa-file-invoice-dollar"></i>
+                                    <select class="form-select" name="loan" required>
+                                        <option value="" disabled selected>Select personal loan status</option>
+                                        <option value="no">No personal loan</option>
+                                        <option value="yes">Has personal loan</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Credit Default -->
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-exclamation-triangle me-2"></i> Credit Default
+                                </label>
+                                <div class="input-group-icon">
+                                    <i class="fas fa-credit-card"></i>
+                                    <select class="form-select" name="default" required>
+                                        <option value="" disabled selected>Select credit default status</option>
+                                        <option value="no">No credit default</option>
+                                        <option value="yes">Has credit default</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Campaign Information Section -->
+                    <div class="form-section">
+                        <h5>
+                            <i class="fas fa-bullhorn me-2"></i> Campaign Details
+                            <span class="feature-highlight">High Impact</span>
+                        </h5>
+                        
+                        <div class="row">
+                            <!-- Month -->
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-calendar-alt me-2"></i> Contact Month
+                                </label>
+                                <div class="input-group-icon">
+                                    <i class="fas fa-calendar"></i>
+                                    <select class="form-select" name="month" required>
+                                        <option value="" disabled selected>Select month</option>
+                                        {% for month in features.categorical.month %}
+                                        <option value="{{ month }}">{{ month.title() }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Day -->
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-calendar-day me-2"></i> Day of Month
+                                </label>
+                                <div class="input-group-icon">
+                                    <i class="fas fa-calendar-check"></i>
+                                    <input type="number" class="form-control" name="day" 
+                                           value="{{ features.numerical.day.default }}"
+                                           min="1" max="31" required>
+                                </div>
+                            </div>
+
+                            <!-- Contact Type -->
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-phone me-2"></i> Contact Type
+                                </label>
+                                <div class="input-group-icon">
+                                    <i class="fas fa-mobile-alt"></i>
+                                    <select class="form-select" name="contact" required>
+                                        <option value="" disabled selected>Select contact type</option>
+                                        {% for contact in features.categorical.contact %}
+                                        <option value="{{ contact }}">{{ contact.title() }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <!-- Duration -->
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-clock me-2"></i> Duration (seconds)
+                                </label>
+                                <div class="input-group-icon">
+                                    <i class="fas fa-stopwatch"></i>
+                                    <input type="number" class="form-control" name="duration" 
+                                           value="{{ features.numerical.duration.default }}"
+                                           min="0" max="5000" step="10">
+                                </div>
+                                <small class="text-muted">Last contact duration</small>
+                            </div>
+
+                            <!-- Campaign Contacts -->
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-phone-volume me-2"></i> Campaign Contacts
+                                </label>
+                                <div class="input-group-icon">
+                                    <i class="fas fa-phone"></i>
+                                    <input type="number" class="form-control" name="campaign" 
+                                           value="{{ features.numerical.campaign.default }}"
+                                           min="1" max="50">
+                                </div>
+                                <small class="text-muted">Number of contacts this campaign</small>
+                            </div>
+
+                            <!-- Previous Outcome -->
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-history me-2"></i> Previous Outcome
+                                </label>
+                                <div class="input-group-icon">
+                                    <i class="fas fa-chart-line"></i>
+                                    <select class="form-select" name="poutcome" required>
+                                        <option value="" disabled selected>Select previous outcome</option>
+                                        {% for outcome in features.categorical.poutcome %}
+                                        <option value="{{ outcome }}">{{ outcome.title() }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pdays and Previous -->
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-calendar-times me-2"></i> Days Since Last Contact
+                                </label>
+                                <div class="input-group-icon">
+                                    <i class="fas fa-hourglass-half"></i>
+                                    <input type="number" class="form-control" name="pdays" 
+                                           value="{{ features.numerical.pdays.default }}"
+                                           min="-1" max="900">
+                                </div>
+                                <small class="text-muted">-1 means not previously contacted</small>
+                            </div>
+
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label fw-bold">
+                                    <i class="fas fa-list-ol me-2"></i> Previous Contacts
+                                </label>
+                                <div class="input-group-icon">
+                                    <i class="fas fa-hashtag"></i>
+                                    <input type="number" class="form-control" name="previous" 
+                                           value="{{ features.numerical.previous.default }}"
+                                           min="0" max="50">
+                                </div>
+                                <small class="text-muted">Number of contacts before this campaign</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Actions -->
+                    <div class="text-center mt-4">
+                        <button type="submit" class="btn btn-primary btn-lg px-5 py-3">
+                            <i class="fas fa-brain me-2"></i> Generate AI Prediction
+                        </button>
+                        <button type="button" class="btn btn-outline-primary btn-lg px-5 py-3 ms-3" 
+                                onclick="fillSampleData()">
+                            <i class="fas fa-flask me-2"></i> Try Sample Data
+                        </button>
+                        <button type="reset" class="btn btn-outline-secondary btn-lg px-5 py-3 ms-3">
+                            <i class="fas fa-redo me-2"></i> Clear Form
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Right Column - Information & Tips -->
+            <div class="col-lg-4">
+                <!-- Prediction Tips -->
+                <div class="card info-card mb-4">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i> Prediction Tips</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="feature-importance">
+                            <span>Duration</span>
+                            <div class="feature-bar" style="width: 95%"></div>
+                        </div>
+                        <div class="feature-importance">
+                            <span>Job Type</span>
+                            <div class="feature-bar" style="width: 85%"></div>
+                        </div>
+                        <div class="feature-importance">
+                            <span>Previous Outcome</span>
+                            <div class="feature-bar" style="width: 80%"></div>
+                        </div>
+                        <div class="feature-importance">
+                            <span>Age</span>
+                            <div class="feature-bar" style="width: 75%"></div>
+                        </div>
+                        <div class="feature-importance">
+                            <span>Balance</span>
+                            <div class="feature-bar" style="width: 70%"></div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h6><i class="fas fa-chart-line me-2"></i> Key Insights:</h6>
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i> Longer calls increase conversion</li>
+                                <li><i class="fas fa-check text-success me-2"></i> May campaigns perform best</li>
+                                <li><i class="fas fa-check text-success me-2"></i> Management jobs convert well</li>
+                                <li><i class="fas fa-times text-danger me-2"></i> Defaults reduce conversion by 60%</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- How It Works -->
+                <div class="card info-card mb-4" id="how-it-works">
+                    <div class="card-header bg-info text-white">
+                        <h5 class="mb-0"><i class="fas fa-cogs me-2"></i> How It Works</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h6>Data Input</h6>
+                                <p class="mb-0">Enter customer details and campaign information</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h6>AI Analysis</h6>
+                                <p class="mb-0">Our model analyzes 15 features using logistic regression</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h6>Prediction</h6>
+                                <p class="mb-0">Get instant probability score with confidence level</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">4</div>
+                            <div class="step-content">
+                                <h6>Recommendations</h6>
+                                <p class="mb-0">Receive actionable insights and next steps</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Stats -->
+                <div class="card info-card">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0"><i class="fas fa-chart-bar me-2"></i> Quick Stats</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="stats-grid">
+                            <div class="stat-item text-center">
+                                <h3 class="text-primary">83%</h3>
+                                <small>Accuracy Rate</small>
+                            </div>
+                            <div class="stat-item text-center">
+                                <h3 class="text-success">0.3s</h3>
+                                <small>Avg. Response Time</small>
+                            </div>
+                            <div class="stat-item text-center">
+                                <h3 class="text-warning">1,500+</h3>
+                                <small>Predictions Made</small>
+                            </div>
+                            <div class="stat-item text-center">
+                                <h3 class="text-info">32.5%</h3>
+                                <small>Avg. Conversion</small>
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <p class="mb-1"><small><i class="fas fa-star text-warning me-1"></i> Most Successful Month: <strong>May</strong></small></p>
+                            <p class="mb-1"><small><i class="fas fa-user-tie text-primary me-1"></i> Top Converting Job: <strong>Management</strong></small></p>
+                            <p class="mb-0"><small><i class="fas fa-phone text-success me-1"></i> Best Contact Type: <strong>Cellular</strong></small></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="fas fa-chart-line"></i> BankPredict AI</h5>
+                    <p>Advanced AI solutions for banking marketing optimization.</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <p>&copy; 2026 BankPredict AI. All rights reserved.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-github"></i></a>
+                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    
+    <script>
+        // Update slider value display
+        function updateValue(id, value) {
+            document.getElementById(id + 'Value').textContent = value;
+            document.getElementById(id).value = value;
+            
+            // Add visual feedback
+            const display = document.getElementById(id + 'Value').parentElement;
+            display.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+            display.style.color = 'white';
+            
+            setTimeout(() => {
+                display.style.background = '';
+                display.style.color = '';
+            }, 300);
+        }
+
+        // Fill sample data for testing
+        function fillSampleData() {
+            // Personal Information
+            updateValue('age', 42);
+            document.querySelector('select[name="job"]').value = 'management';
+            document.querySelector('select[name="marital"]').value = 'married';
+            document.querySelector('select[name="education"]').value = 'tertiary';
+            
+            // Financial Information
+            document.querySelector('input[name="balance"]').value = 12500;
+            document.querySelector('select[name="housing"]').value = 'yes';
+            document.querySelector('select[name="loan"]').value = 'no';
+            document.querySelector('select[name="default"]').value = 'no';
+            
+            // Campaign Information
+            document.querySelector('select[name="month"]').value = 'may';
+            document.querySelector('input[name="day"]').value = 15;
+            document.querySelector('select[name="contact"]').value = 'cellular';
+            document.querySelector('input[name="duration"]').value = 350;
+            document.querySelector('input[name="campaign"]').value = 2;
+            document.querySelector('select[name="poutcome"]').value = 'success';
+            document.querySelector('input[name="pdays"]').value = 150;
+            document.querySelector('input[name="previous"]').value = 3;
+            
+            // Show notification
+            showNotification('Sample data loaded! Adjust values as needed.', 'success');
+        }
+
+        // Form validation and submission
+        document.getElementById('predictionForm').addEventListener('submit', function(e) {
+            // Validate required fields
+            const requiredSelects = this.querySelectorAll('select[required]');
+            let isValid = true;
+            
+            requiredSelects.forEach(select => {
+                if (!select.value) {
+                    select.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    select.classList.remove('is-invalid');
+                }
+            });
+            
+            if (!isValid) {
+                e.preventDefault();
+                showNotification('Please fill all required fields marked with *', 'danger');
+                return false;
+            }
+            
+            // Show loading animation
+            const submitBtn = this.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            submitBtn.disabled = true;
+            
+            // Add loading class to form
+            this.classList.add('loading');
+            
+            // Form will submit normally after this
+        });
+
+        // Notification function
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `alert alert-${type} alert-dismissible fade show position-fixed`;
+            notification.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+            notification.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.remove();
+                }
+            }, 5000);
+        }
+
+        // Initialize form with some default values
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set current month as default
+            const months = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+            const currentMonth = new Date().getMonth();
+            document.querySelector('select[name="month"]').value = months[currentMonth];
+            
+            // Set current day as default
+            const currentDay = new Date().getDate();
+            document.querySelector('input[name="day"]').value = currentDay;
+            
+            // Add animation to steps
+            document.querySelectorAll('.step').forEach((step, index) => {
+                step.style.animationDelay = `${index * 0.2}s`;
+                step.classList.add('animate-step');
+            });
+            
+            // Add animation to stats
+            document.querySelectorAll('.stat-item h3').forEach((stat, index) => {
+                stat.style.animationDelay = `${index * 0.1}s`;
+                stat.classList.add('animate-stat');
+            });
+        });
+    </script>
+
+    <style>
+        /* Animation styles */
+        .animate-step {
+            animation: slideInLeft 0.5s ease forwards;
+            opacity: 0;
+        }
+        
+        .animate-stat {
+            animation: countUp 1s ease forwards;
+            opacity: 0;
+        }
+        
+        .step {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            background: rgba(102, 126, 234, 0.05);
+            border-radius: 10px;
+        }
+        
+        .step-number {
+            width: 30px;
+            height: 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 1rem;
+        }
+        
+        .step-content h6 {
+            margin-bottom: 0.2rem;
+            color: var(--primary-color);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+        
+        .stat-item {
+            padding: 1rem;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-item:hover {
+            transform: translateY(-5px);
+        }
+        
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        
+        @keyframes countUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Loading state */
+        .loading {
+            position: relative;
+            opacity: 0.7;
+        }
+        
+        .loading:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+        
+        /* Form validation styles */
+        .is-invalid {
+            border-color: #dc3545 !important;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+    </style>
+</body>
+</html>
